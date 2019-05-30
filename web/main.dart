@@ -182,6 +182,18 @@ class LSystem {
 }
 
 void main() {
+  // Parse query
+  List<String> rawQuery;
+  try {
+    rawQuery = window.location.search.substring(1).split('&');
+  } catch (e) {
+    rawQuery = [];
+  }
+  final query = Map.fromEntries(List.generate(rawQuery.length, (i) {
+    final pair = rawQuery[i].split('=');
+    return MapEntry(pair.first, pair.last);
+  }));
+
   // Setup rendering
   final canvas = CanvasElement(width: 1000, height: 1000)
     ..style.border = "black 2px solid";
@@ -190,24 +202,37 @@ void main() {
   final turtle = Turtle(turtleDefualtPosition * 1, turtleDefaultAngle, canvas);
 
   // Setup ui for lsystem
-  final axiomInput = InputElement();
-  final angleInput = InputElement(type: "number")..style.width = "40px";
-  final defaultColorInput = InputElement(type: "color");
-  final colorGradientInput = InputElement(type: "color");
+  final axiomInput = InputElement()..value = query["axiom"] ?? "";
+  final angleInput = InputElement(type: "number")
+    ..style.width = "40px"
+    ..value = query["angle"] ?? "";
+  final defaultColorInput = InputElement(type: "color")
+    ..value = query["default"] ?? "";
+  final colorGradientInput = InputElement(type: "color")
+    ..value = query["grad"] ?? "";
   final colorGradientDirectionInput = SpanElement()
-    ..children = List.generate(3, (_) => InputElement(type: "checkbox"));
+    ..children = List.generate(
+        3,
+        (i) => InputElement(type: "checkbox")
+          ..checked = (query["gradDir$i"] ?? "1") == "-1");
+  final queryProductions = query["prods"]
+          ?.split(",")
+          ?.map((p) => p.split(";")) ??
+      [];
   final productionInput = DivElement()
-    ..children.add(DivElement()
+    ..children.addAll(queryProductions.map((production) => DivElement()
       ..children = [
         InputElement()
           ..style.width = "15px"
-          ..value = "1",
-        InputElement(),
-        InputElement()..style.width = "200px",
+          ..value = production[0],
+        InputElement()..value = production[1],
+        InputElement()
+          ..style.width = "200px"
+          ..value = production[2],
         ButtonElement()
           ..text = "-"
           ..onClick.listen((e) => (e.target as Element).parent.remove()),
-      ]);
+      ]));
   final newProductionButton = ButtonElement()
     ..text = "+"
     ..onClick.listen((_) => productionInput.children.add(DivElement()
@@ -221,7 +246,7 @@ void main() {
           ..text = "-"
           ..onClick.listen((e) => (e.target as Element).parent.remove()),
       ]));
-  final iterationInput = InputElement(type: "number")..style.width = "30px";
+  final iterationInput = InputElement(type: "number")..style.width = "30px"..value = query["n"] ?? "";
   LSystemExecuter executor;
   final runButton = ButtonElement()
     ..text = "run"
@@ -294,6 +319,7 @@ void main() {
         executor.run();
       }
     });
+  if (query["run"] == "true") runButton.click();
   document.body.children.add(DivElement()
     ..children = [
       SpanElement()..text = "LSystem rules:",
