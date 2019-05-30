@@ -215,10 +215,8 @@ void main() {
         3,
         (i) => InputElement(type: "checkbox")
           ..checked = (query["gradDir$i"] ?? "1") == "-1");
-  final queryProductions = query["prods"]
-          ?.split(",")
-          ?.map((p) => p.split(";")) ??
-      [];
+  final queryProductions =
+      query["prods"]?.split(",")?.map((p) => p.split(";")) ?? [];
   final productionInput = DivElement()
     ..children.addAll(queryProductions.map((production) => DivElement()
       ..children = [
@@ -246,7 +244,9 @@ void main() {
           ..text = "-"
           ..onClick.listen((e) => (e.target as Element).parent.remove()),
       ]));
-  final iterationInput = InputElement(type: "number")..style.width = "30px"..value = query["n"] ?? "";
+  final iterationInput = InputElement(type: "number")
+    ..style.width = "30px"
+    ..value = query["n"] ?? "";
   LSystemExecuter executor;
   final runButton = ButtonElement()
     ..text = "run"
@@ -274,8 +274,8 @@ void main() {
                   ]))
         ..expandn(int.parse(iterationInput.value));
       final angle = int.tryParse(angleInput.value) ?? 25;
-      executor = LSystemExecuter.normal(
-          system, turtle, angle == -1 ? 25 : angle, 5,
+      executor = LSystemExecuter.normal(system, turtle,
+          angle == -1 ? 25 : angle, double.tryParse(query["dist"]) ?? 5,
           colorGradientStep: List.generate(3, (i) {
             final a = int.parse(
                     colorGradientInput.value.substring(i * 2 + 1, i * 2 + 3),
