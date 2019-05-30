@@ -1,4 +1,4 @@
-An L system interpreter and renderer web app written in dart.
+An L system interpreter and renderer web app written in dart. To see the interpreter itself go to [https://codadillo.github.io/l-system-interpreter/build/](https://codadillo.github.io/l-system-interpreter/build/).
 
 ## Variables:
 In the interpreter, the following variable commands mappings are made:
