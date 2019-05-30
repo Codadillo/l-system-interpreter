@@ -15,7 +15,7 @@ G and F: Move forward
 
 \>: step color by color gradient step
 
-<: step color back by color gradient step
+\<: step color back by color gradient step
 
 H: F>
 
