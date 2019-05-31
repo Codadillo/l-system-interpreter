@@ -2999,10 +2999,12 @@ u=this.f.value
 t=this.a.c
 s=P.h
 r=H.j(t,0)
-r=P.c6(["grad",y,"default",x,"axiom",w,"angle",v,"n",u,"prods",new H.aw(t,H.f(new F.fO(),{func:1,ret:s,args:[r]}),[r,s]).I(0,","),"run","true","dist",this.r.h(0,"dist")],s,s)
-r=r.gau(r)
-t=H.aj(r,"k",0)
-s=H.c9(r,H.f(new F.fP(),{func:1,ret:s,args:[t]}),t,s).I(0,"&")
+r=new H.aw(t,H.f(new F.fO(),{func:1,ret:s,args:[r]}),[r,s]).I(0,",")
+t=this.r.h(0,"dist")
+y=P.c6(["grad",y,"default",x,"axiom",w,"angle",v,"n",u,"prods",r,"run","true","dist",t==null?"10":t],s,s)
+y=y.gau(y)
+x=H.aj(y,"k",0)
+s=H.c9(y,H.f(new F.fP(),{func:1,ret:s,args:[x]}),x,s).I(0,"&")
 q=z+H.h7(s,"#","%23")
 z=document
 p=z.createElement("span")

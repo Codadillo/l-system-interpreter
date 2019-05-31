@@ -263,7 +263,7 @@ void main() {
             "n": iterationInput.value,
             "prods": productions.map((p) => p.join(";")).join(","),
             "run": "true",
-            "dist": query["dist"],
+            "dist": query["dist"] ?? "10",
           }
               .entries
               .map((query) => "${query.key}=${query.value}")
