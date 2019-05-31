@@ -252,7 +252,7 @@ void main() {
   final shareButton = ButtonElement()
     ..text = "share"
     ..onClick.listen((_) {
-      final shareUrl = window.location.host +
+      final shareUrl = "https://" + window.location.host +
           window.location.pathname +
           "?" +
           {
