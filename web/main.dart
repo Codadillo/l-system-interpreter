@@ -248,6 +248,34 @@ void main() {
     ..style.width = "30px"
     ..value = query["n"] ?? "";
   LSystemExecuter executor;
+  List<List> productions = [];
+  final shareButton = ButtonElement()
+    ..text = "share"
+    ..onClick.listen((_) {
+      final shareUrl = window.location.host +
+          window.location.pathname +
+          "?" +
+          {
+            "grad": colorGradientInput.value,
+            "default": defaultColorInput.value,
+            "axiom": axiomInput.value,
+            "angle": angleInput.value,
+            "n": iterationInput.value,
+            "prods": productions.map((p) => p.join(";")).join(","),
+            "run": "true",
+            "dist": query["dist"],
+          }
+              .entries
+              .map((query) => "${query.key}=${query.value}")
+              .join("&")
+              .replaceAll("#", "%23");
+      final copyElement = SpanElement()..text = shareUrl;
+      document.body.children.add(copyElement);
+      window.getSelection().selectAllChildren(copyElement);
+      document.execCommand("copy");
+      copyElement.remove();
+      window.alert("Copied sharable link to clipboard");
+    });
   final runButton = ButtonElement()
     ..text = "run"
     ..onClick.listen((_) {
@@ -258,37 +286,30 @@ void main() {
           (i) => int.parse(
               defaultColorInput.value.substring(i * 2 + 1, i * 2 + 3),
               radix: 16))));
-      final system = LSystem.stochastic(
-          axiomInput.value,
-          List.generate(
-              productionInput.children.length,
-              (i) => [
-                    double.tryParse((productionInput.children[i].children[0]
-                                as InputElement)
-                            .value) ??
-                        1,
-                    (productionInput.children[i].children[1] as InputElement)
-                        .value,
-                    (productionInput.children[i].children[2] as InputElement)
-                        .value
-                  ]))
+      productions = List.generate(
+          productionInput.children.length,
+          (i) => [
+                double.tryParse((productionInput.children[i].children[0]
+                            as InputElement)
+                        .value) ??
+                    1,
+                (productionInput.children[i].children[1] as InputElement).value,
+                (productionInput.children[i].children[2] as InputElement).value
+              ]);
+      final system = LSystem.stochastic(axiomInput.value, productions)
         ..expandn(int.parse(iterationInput.value));
       final angle = int.tryParse(angleInput.value) ?? 25;
       executor = LSystemExecuter.normal(system, turtle,
           angle == -1 ? 25 : angle, double.tryParse(query["dist"] ?? "5"),
-          colorGradientStep: List.generate(3, (i) {
-            final a = int.parse(
-                    colorGradientInput.value.substring(i * 2 + 1, i * 2 + 3),
-                    radix: 16) *
-                ((colorGradientDirectionInput.children[i] as InputElement)
-                        .checked
-                    ? -1
-                    : 1);
-            print(i);
-            print(a);
-            print(colorGradientInput.value);
-            return a;
-          }),
+          colorGradientStep: List.generate(
+              3,
+              (i) =>
+                  int.parse(
+                      colorGradientInput.value.substring(i * 2 + 1, i * 2 + 3),
+                      radix: 16) *
+                  ((colorGradientDirectionInput.children[i] as InputElement).checked
+                      ? -1
+                      : 1)),
           alternateColor: List.generate(
               3,
               (i) => int.parse(
@@ -344,6 +365,7 @@ void main() {
       iterationInput,
       BRElement(),
       runButton,
+      shareButton,
       BRElement(),
       canvas,
     ]
