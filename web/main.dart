@@ -300,7 +300,7 @@ void main() {
         ..expandn(int.parse(iterationInput.value));
       final angle = int.tryParse(angleInput.value) ?? 25;
       executor = LSystemExecuter.normal(system, turtle,
-          angle == -1 ? 25 : angle, double.tryParse(query["dist"] ?? "5"),
+          angle == -1 ? 25 : angle, double.tryParse(query["dist"] ?? "5") ?? 5,
           colorGradientStep: List.generate(
               3,
               (i) =>
