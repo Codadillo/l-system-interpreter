@@ -3,22 +3,24 @@ import 'dart:html';
 
 class TurtleFlag {
   Point position;
-  double angle;
+  num angle;
+  num width;
   List<num> color;
 
-  TurtleFlag(this.position, this.angle, this.color);
+  TurtleFlag(this.position, this.angle, this.color, this.width);
 }
 
 class Turtle {
   Point position;
-  double angle;
+  num angle;
+  num width;
   List<num> color;
   List<TurtleFlag> flags;
   CanvasElement canvas;
   CanvasRenderingContext2D context;
 
   Turtle(this.position, this.angle, this.canvas,
-      {List<num> color: const [0, 0, 0]}) {
+      {this.width: 1, List<num> color: const [0, 0, 0]}) {
     context = canvas.context2D..beginPath();
     with_color(color);
     flags = [];
@@ -28,6 +30,7 @@ class Turtle {
     context.moveTo(position.x, position.y);
     position += Point(cos(angle), sin(angle)) * distance;
     context
+      ..lineWidth = width
       ..lineTo(position.x, position.y)
       ..strokeStyle =
           "rgb(${this.color[0]}, ${this.color[1]}, ${this.color[2]})";
@@ -42,6 +45,14 @@ class Turtle {
     angle += degrees * pi / 180;
   }
 
+  void with_width(num px)  {
+    width = px.clamp(0, double.infinity);
+  }
+
+  void scale_line_width(num px) {
+    width += px.clamp(1 - width, double.infinity);
+  }
+
   void step_color(List<num> color) {
     with_color(List.generate(3, (i) => this.color[i] + color[i]));
   }
@@ -53,7 +64,7 @@ class Turtle {
   }
 
   void placeFlag() {
-    flags.add(TurtleFlag(position * 1, angle, List.from(color)));
+    flags.add(TurtleFlag(position * 1, angle, List.from(color), width));
   }
 
   void revertToFlag() {
@@ -61,6 +72,7 @@ class Turtle {
     position = flag.position;
     angle = flag.angle;
     with_color(flag.color);
+    width = flag.width;
   }
 
   void with_scale(num x, num y) {
@@ -88,6 +100,8 @@ class LSystemExecuter {
 
   LSystemExecuter.normal(this.l, Turtle turtle, num angle, num distance,
       {bool deg: false,
+      num widthGradientScale: 0,
+      num alternateWidth: 1,
       List<num> colorGradientStep: const [0, 0, 0],
       List<num> alternateColor: const [0, 0, 0]}) {
     if (deg) angle *= pi / 180;
@@ -104,12 +118,17 @@ class LSystemExecuter {
         turtle.with_color(alternateColor);
         turtle.move(distance);
       },
+      "^": () => turtle.with_color(alternateColor),
       "-": () => turtle.turn(-angle),
       "+": () => turtle.turn(angle),
+      "|": () => turtle.turn(pi),
       ">": () => turtle.step_color(colorGradientStep),
       "<": () => turtle.step_color(colorGradientStep.map((c) => -c)),
       "[": turtle.placeFlag,
       "]": turtle.revertToFlag,
+      "*": () => turtle.with_width(alternateWidth),
+      "/": () => turtle.scale_line_width(widthGradientScale),
+      "\\": () => turtle.scale_line_width(1 / widthGradientScale),
     };
   }
 
@@ -181,11 +200,46 @@ class LSystem {
   }
 }
 
+const URL_UNSAFE_CHARS = {
+  " ": "20",
+  "\"": "22",
+  ">": "3C",
+  "<": "3E",
+  "#": "23",
+  "%": "25",
+  "{": "7B",
+  "}": "7D",
+  "|": "7C",
+  "\\": "5C",
+  "^": "5E",
+  "~": "7E",
+  "[": "5B",
+  "]": "5D",
+  "`": "60",
+};
+
+String urlEncode(String url) {
+  for (final encode in URL_UNSAFE_CHARS.entries)
+    url = url.replaceAll(encode.key, "%${encode.value}");
+  return url;
+}
+
+String urlDecode(String url) {
+  for (final encode in URL_UNSAFE_CHARS.entries)
+    url = url.replaceAll("%${encode.value}", encode.key);
+  return url;
+}
+
 void main() {
   // Parse query
   List<String> rawQuery;
   try {
-    rawQuery = window.location.search.substring(1).split('&');
+    rawQuery = window.location.search
+        .substring(1)
+        .replaceAll("%5B", "[")
+        .replaceAll("%5D", "]")
+        .replaceAll("%7C", "|")
+        .split('&');
   } catch (e) {
     rawQuery = [];
   }
@@ -207,9 +261,9 @@ void main() {
     ..style.width = "40px"
     ..value = query["angle"] ?? "";
   final defaultColorInput = InputElement(type: "color")
-    ..value = query["default"] ?? "";
+    ..value = "#${query["default"]}" ?? "";
   final colorGradientInput = InputElement(type: "color")
-    ..value = query["grad"] ?? "";
+    ..value = "#${query["grad"]}" ?? "";
   final colorGradientDirectionInput = SpanElement()
     ..children = List.generate(
         3,
@@ -252,23 +306,36 @@ void main() {
   final shareButton = ButtonElement()
     ..text = "share"
     ..onClick.listen((_) {
-      final shareUrl = "https://" + window.location.host +
+      final shareUrl = window.location.protocol +
+          "//" +
+          window.location.host +
           window.location.pathname +
           "?" +
-          {
-            "grad": colorGradientInput.value,
-            "default": defaultColorInput.value,
+          ({
+            "grad": colorGradientInput.value.substring(1),
+            "default": defaultColorInput.value.substring(1),
             "axiom": axiomInput.value,
             "angle": angleInput.value,
             "n": iterationInput.value,
-            "prods": productions.map((p) => p.join(";")).join(","),
+            "prods": productions
+                .map((p) => p.join(";"))
+                .join(",")
+                .replaceAll("[", "%5B")
+                .replaceAll("]", "%5D")
+                .replaceAll("|", "%7C"),
             "run": "true",
-            "dist": query["dist"] ?? "10",
-          }
+            "dist": query["dist"] ?? "5",
+          }..addEntries(List.generate(
+                  colorGradientDirectionInput.children.length,
+                  (i) => MapEntry(
+                      "gradDir$i",
+                      (colorGradientDirectionInput.children[i] as InputElement)
+                              .checked
+                          ? "-1"
+                          : "1"))))
               .entries
               .map((query) => "${query.key}=${query.value}")
-              .join("&")
-              .replaceAll("#", "%23");
+              .join("&");
       final copyElement = SpanElement()..text = shareUrl;
       document.body.children.add(copyElement);
       window.getSelection().selectAllChildren(copyElement);
