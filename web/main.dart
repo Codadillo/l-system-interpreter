@@ -114,6 +114,10 @@ class LSystemExecuter {
         turtle.step_color(colorGradientStep);
         turtle.move(distance);
       },
+      "K": () {
+        turtle.step_color(colorGradientStep.map((c) => -c).toList());
+        turtle.move(distance);
+      },
       "J": () {
         turtle.with_color(alternateColor);
         turtle.move(distance);
