@@ -123,7 +123,7 @@ class LSystemExecuter {
       "+": () => turtle.turn(angle),
       "|": () => turtle.turn(pi),
       ">": () => turtle.step_color(colorGradientStep),
-      "<": () => turtle.step_color(colorGradientStep.map((c) => -c)),
+      "<": () => turtle.step_color(colorGradientStep.map((c) => -c).toList()),
       "[": turtle.placeFlag,
       "]": turtle.revertToFlag,
       "*": () => turtle.with_width(alternateWidth),
