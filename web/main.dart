@@ -172,7 +172,7 @@ class LSystem {
             ..sort((a, b) => a[0].compareTo(b[0]));
       this.productions[RegExp(RegExp.escape(production[1]))] = () {
         final random = Random().nextDouble();
-        var sumRandom = 0;
+        num sumRandom = 0;
         for (final potentialProduction in potentialProductions) {
           sumRandom += potentialProduction[0];
           if (random < sumRandom) return potentialProduction[2];
@@ -275,7 +275,7 @@ void main() {
     ..children.addAll(queryProductions.map((production) => DivElement()
       ..children = [
         InputElement()
-          ..style.width = "15px"
+          ..style.width = "30px"
           ..value = production[0],
         InputElement()..value = production[1],
         InputElement()
@@ -290,7 +290,7 @@ void main() {
     ..onClick.listen((_) => productionInput.children.add(DivElement()
       ..children = [
         InputElement()
-          ..style.width = "15px"
+          ..style.width = "30px"
           ..value = "1",
         InputElement(),
         InputElement()..style.width = "200px",
