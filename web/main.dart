@@ -54,7 +54,7 @@ class Turtle {
   }
 
   void step_color(List<num> color) {
-    with_color(List.generate(3, (i) => this.color[i] + color[i]));
+    with_color(List.generate(3, (i) => (this.color[i] + color[i]).clamp(0, 255)));
   }
 
   void with_color(List<num> color) {
