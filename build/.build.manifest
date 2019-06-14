@@ -3,7 +3,6 @@ favicon.ico
 index.html
 main.dart.js
 packages/$sdk/_internal/ddc_sdk.sum
-packages/$sdk/_internal/spec.sum
 packages/$sdk/_internal/strong.sum
 packages/$sdk/dev_compiler/amd/dart_sdk.js
 packages/$sdk/dev_compiler/amd/require.js
@@ -22,7 +21,6 @@ packages/$sdk/dev_compiler/legacy/dart_sdk.js
 packages/$sdk/dev_compiler/web/dart_stack_trace_mapper.js
 packages/$sdk/dev_compiler/web/ddc_web_compiler.js
 packages/analyzer/src/summary/format.fbs
-packages/build_modules/src/analysis_options.default.yaml
 packages/build_runner/src/server/README.md
 packages/build_runner/src/server/build_updates_client/hot_reload_client.dart.js
 packages/build_runner/src/server/build_updates_client/live_reload_client.js
@@ -38,9 +36,17 @@ packages/front_end/src/fasta/dill/README.md
 packages/front_end/src/fasta/kernel/README.md
 packages/front_end/src/fasta/parser/parser.md
 packages/front_end/src/fasta/source/README.md
-packages/kernel/analyzer/readme.md
 packages/kernel/binary/readme.md
 packages/kernel/target/readme.md
 packages/kernel/text/readme.md
+packages/package_resolver/src/test_package_config
+packages/pedantic/analysis_options.1.0.0.yaml
+packages/pedantic/analysis_options.1.1.0.yaml
+packages/pedantic/analysis_options.1.2.0.yaml
+packages/pedantic/analysis_options.1.3.0.yaml
+packages/pedantic/analysis_options.1.4.0.yaml
+packages/pedantic/analysis_options.1.5.0.yaml
+packages/pedantic/analysis_options.1.6.0.yaml
+packages/pedantic/analysis_options.1.7.0.yaml
 packages/pedantic/analysis_options.yaml
 styles.css
